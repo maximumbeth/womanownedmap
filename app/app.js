@@ -262,7 +262,7 @@ function load(){
     if (/^\s*</.test(t)) throw new Error("notcsv"); var rows=parseCsv(t); if(!rows.length || !("name" in rows[0])) throw new Error("columns"); return rows; });
   var b = C.cities ? Promise.resolve(C.cities) : (!badUrl(C.citiesCsvUrl) ? fetch(C.citiesCsvUrl).then(function(x){return x.ok?x.text():"";}).then(parseCsv).catch(function(){return [];}) : Promise.resolve([]));
   var tp = C.tips ? Promise.resolve(C.tips) : (!badUrl(C.tipsCsvUrl) ? fetch(C.tipsCsvUrl).then(function(x){return x.ok?x.text():"";}).then(parseCsv).catch(function(){return [];}) : Promise.resolve([]));
-  tp.then(function(rows){ rows.forEach(function(t){ if(!t.listing_id||!t.tip) return; (TIPS[t.listing_id]=TIPS[t.listing_id]||[]).push(t); }); });
+  tp.then(function(rows){ rows.forEach(function(t){ if(!t.listing_id||(!t.tip&&!mediaUrl(t.photo_url))) return; (TIPS[t.listing_id]=TIPS[t.listing_id]||[]).push(t); }); });
   return Promise.all([a,b,tp]).then(function(res){
     res[1].forEach(function(c){ if(c.city_guide) CITIES[c.city_guide]=c; });
     DATA=prep(res[0]);
@@ -853,7 +853,7 @@ function tipsBlock(r){
   if (r.listing_type==="Online") return "";
   var t=(TIPS[r.listing_id]||[]).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
   return '<div class="wo-tips"><span class="wo-eyebrow">Traveler tips</span><h3 style="font-size:24px">'+(t.length?t.length+(t.length===1?" tip":" tips")+" from the community":"Been here? Leave the first tip")+'</h3>'+
-    t.slice(0,6).map(function(x){return '<blockquote class="wo-tip"><p>\u201c'+esc(x.tip)+'\u201d</p><span class="wo-mono">'+esc(x.name||"A Wanderful traveler")+(x.date?' \u00b7 '+esc(new Date(x.date+"T12:00:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})):'')+'</span></blockquote>';}).join("")+
+    t.filter(function(x){return x.tip;}).slice(0,6).map(function(x){return '<blockquote class="wo-tip"><p>\u201c'+esc(x.tip)+'\u201d</p><span class="wo-mono">'+esc(x.name||"A Wanderful traveler")+(x.date?' \u00b7 '+esc(new Date(x.date+"T12:00:00").toLocaleDateString(undefined,{month:"short",year:"numeric"})):'')+'</span></blockquote>';}).join("")+
     (function(){ var ph=t.filter(function(x){return mediaUrl(x.photo_url);}); return ph.length?'<div class="wo-tgal">'+ph.slice(0,9).map(function(x){return '<figure><img src="'+esc(mediaUrl(x.photo_url))+'" alt="Traveler photo of '+esc(r.name)+'" loading="lazy"><figcaption>'+esc(x.name||"A Wanderful traveler")+'</figcaption></figure>';}).join("")+'</div>':''; })()+'<form class="wo-tipform" id="wo-tipform" data-id="'+esc(r.listing_id)+'" novalidate>'+
       '<label for="wo-tiptext" class="wo-small">'+(t.length?'Add your tip':'What to order, which room to ask for, the best time to go')+'</label>'+
       '<textarea id="wo-tiptext" maxlength="280" rows="3" placeholder="Ask for the window seat and get the cardamom bun."></textarea>'+
