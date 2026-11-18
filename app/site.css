@@ -1,0 +1,32 @@
+/* Plain-HTML version of each page (what search engines and AI tools read). The interactive map replaces it as soon as it loads. */
+html,body{margin:0;background:#F0F6F9;color:#0D2B32}
+body{font-family:Figtree,"Helvetica Neue",Arial,sans-serif;line-height:1.55}
+.wo-static{max-width:1100px;margin:0 auto;padding:0 20px 40px}
+.wo-static a{color:#016F80}
+.st-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding:14px 0;border-bottom:1px solid #D5E3E8;margin-bottom:24px}
+.st-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#0D2B32;margin-right:auto}
+.st-brand img{border-radius:50%}
+.st-brand b{display:block;font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:20px;color:#0D2B32}
+.st-brand small{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#557079}
+.st-head nav{display:flex;flex-wrap:wrap;gap:6px 16px}
+.st-head nav a{text-decoration:none}
+.wo-static h1,.wo-static h2{font-family:"Young Serif",Georgia,serif;font-weight:400;line-height:1.15}
+.wo-static h1{font-size:clamp(32px,5vw,52px);margin:8px 0 12px}
+.wo-static h2{font-size:28px;margin:36px 0 12px}
+.wo-static h3{font-size:18px;margin:0 0 4px}
+.st-lede,.st-answer{font-size:18px;max-width:760px}
+.st-answer{background:#fff;border:1px solid #D5E3E8;border-radius:16px;padding:14px 18px}
+.st-crumbs{font-size:14px;color:#557079}
+.st-list{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.st-item{background:#fff;border:1px solid #D5E3E8;border-radius:16px;padding:14px 16px}
+.st-item p{margin:4px 0}
+.st-meta{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#C7577A}
+.st-owner{font-size:14px;color:#557079}
+.st-deal{font-size:14px;background:#FCF1D6;border-radius:8px;padding:4px 8px;display:inline-block}
+.st-cities,.st-links{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 18px}
+.st-cities span{color:#557079;font-size:14px}
+.st-facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px}
+.st-facts dt{font-weight:700}
+.st-facts dd{margin:0}
+.st-foot{max-width:1100px;margin:0 auto;padding:24px 20px 110px;font-size:14px;color:#557079;border-top:1px solid #D5E3E8}
+.st-foot a{color:#016F80}
