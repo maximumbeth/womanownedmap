@@ -221,11 +221,14 @@ function watchPhotos(){
   if (!gObs) gObs=new IntersectionObserver(function(es){ es.forEach(function(e){ if(!e.isIntersecting) return; gObs.unobserve(e.target); var r=BYID[e.target.getAttribute("data-open")]; if(r) fillGPhoto(e.target,r); }); },{rootMargin:"200px"});
   root.querySelectorAll(".wo-card[data-gp]").forEach(function(c){ gObs.observe(c); });
 }
+/* Who took the main photo: matches the listing photo to an approved traveler photo. */
+function photoBy(r){ var u=mediaUrl(r.photo_url); if(!u) return ""; var t=(TIPS[r.listing_id]||[]).filter(function(x){return x.name && mediaUrl(x.photo_url)===u;})[0]; return t?t.name:""; }
+function wantsPhoto(r){ return r.listing_type==="Place" && !mediaUrl(r.photo_url); }
 function stamp(r, opt){
   opt=opt||{}; var c=cat(r), photo=mediaUrl(r.photo_url), pm=(r.city||r.meets_near||(r.listing_type==="Online"?"Worldwide":"")).toUpperCase();
   if (r.country && r.country!=="US" && r.city) pm+=" \u00b7 "+String(r.country).toUpperCase();
   return '<div class="wo-stamp" style="--cc:'+c.c+'">'+pattern(hash(r.name))+
-    '<div class="medal">'+ico(c.i,"")+'</div>'+(photo?'<img src="'+esc(photo)+'" alt="" loading="lazy">':'')+
+    '<div class="medal">'+ico(c.i,"")+'</div>'+(photo?'<img src="'+esc(photo)+'" alt="" loading="lazy">'+(photoBy(r)?'<span class="wo-gattr">Photo by '+esc(photoBy(r))+'</span>':''):(opt.ask&&wantsPhoto(r)?'<span class="wo-askphoto">'+ico("plus")+' Add the first photo</span>':''))+
     (opt.nopm||!pm?'':'<span class="pm">'+esc(pm)+'</span>')+'</div>';
 }
 
@@ -301,7 +304,7 @@ function pills(r, max){
 function card(r){
   var c=cat(r);
   return '<article class="wo-card'+(r.isMember?' member':'')+'" style="--cc:'+c.c+'" data-open="'+esc(r.listing_id)+'"'+(r.google_place_id&&!r.photo_url&&gPhotoOn("cards")?' data-gp="1"':'')+' tabindex="0" role="button" aria-label="'+esc(r.name)+'">'+
-    heart(r)+'<div class="wo-perf">'+stamp(r)+'</div>'+
+    heart(r)+'<div class="wo-perf">'+stamp(r,{ask:true})+'</div>'+
     (r.isMember ? (r.headshot_url?'<img class="hs" src="'+esc(mediaUrl(r.headshot_url))+'" alt="" loading="lazy">':'<span class="hs" aria-hidden="true">'+esc(r.name.charAt(0))+'</span>') : '')+
     '<div class="body">'+(r.isMember?'<span class="wo-hosttag">'+(C.logoUrl?'<img src="'+esc(C.logoUrl)+'" alt="">':'')+'Member Host</span>':'')+
     '<span class="cat">'+esc(c.short)+'</span><h4>'+esc(r.name)+'</h4><span class="where">'+esc(where(r))+'</span>'+
@@ -786,6 +789,7 @@ function openDetail(id){
    (r.member_deal?'<div class="wo-dealbox"><span class="wo-eyebrow" style="color:var(--gold)">Member deal</span><b>'+esc(r.member_deal)+'</b><p class="wo-small" style="color:var(--ink)">Wanderful members find the code in the member community.</p><div class="wo-quick">'+(C.memberDealsUrl?'<a class="wo-btn wo-pri wo-sm" href="'+esc(C.memberDealsUrl)+'" target="_blank" rel="noopener">Get the code</a>':'')+(C.joinUrl?'<a class="wo-btn wo-sm" href="'+esc(C.joinUrl)+'" target="_blank" rel="noopener">Become a member</a>':'')+'</div></div>':'')+
    (info.length?'<div class="wo-info">'+info.join("")+'</div>':'')+
    (geo(r)&&!useG(r)?'<div class="wo-minimap"><div class="wo-map" id="wo-minimap"></div></div>':'')+
+   (wantsPhoto(r)?'<div class="wo-photoask"><b>'+ico("plus")+(useG(r)?' This photo is from Google. Been here?':' No photo yet. Been here?')+'</b><p>Add the first traveler photo of '+esc(r.name)+'. Once our team approves it, it becomes the main photo here, with credit to your first name.</p><button class="wo-btn wo-pri wo-sm" type="button" data-act="addphoto">Add a photo</button></div>':'')+
    tipsBlock(r)+
    (near.length?'<div style="display:grid;gap:8px"><span class="wo-eyebrow">Woman-owned nearby</span>'+near.map(function(x){x._d=x._n; var hold=S.me; S.me=S.me||{}; var out=row(x); S.me=hold; return out;}).join("")+'</div>':'')+
    (r.city_guide&&CITYLIST.some(function(c){return c.slug===r.city_guide;})&&S.view!=="city"?'<button class="wo-btn" type="button" data-city="'+esc(r.city_guide)+'">'+ico("city")+' Open the '+esc(cityName(r.city_guide))+' guide</button>':'')+
@@ -857,7 +861,7 @@ function tipsBlock(r){
     (function(){ var ph=t.filter(function(x){return mediaUrl(x.photo_url);}); return ph.length?'<div class="wo-tgal">'+ph.slice(0,9).map(function(x){return '<figure><img src="'+esc(mediaUrl(x.photo_url))+'" alt="Traveler photo of '+esc(r.name)+'" loading="lazy"><figcaption>'+esc(x.name||"A Wanderful traveler")+'</figcaption></figure>';}).join("")+'</div>':''; })()+'<form class="wo-tipform" id="wo-tipform" data-id="'+esc(r.listing_id)+'" novalidate>'+
       '<label for="wo-tiptext" class="wo-small">'+(t.length?'Add your tip':'What to order, which room to ask for, the best time to go')+'</label>'+
       '<textarea id="wo-tiptext" maxlength="280" rows="3" placeholder="Ask for the window seat and get the cardamom bun."></textarea>'+
-      '<label class="wo-photopick"><input id="wo-tipphoto" type="file" accept="image/*">'+ico("plus")+'<span id="wo-tipphotolbl">Add a photo (optional)</span></label>'+
+      '<label class="wo-photopick"><input id="wo-tipphoto" type="file" accept="image/*">'+ico("plus")+'<span id="wo-tipphotolbl">'+(wantsPhoto(r)?'Add the first photo':'Add a photo (optional)')+'</span></label>'+
       '<label class="wo-rights" id="wo-tiprights" hidden><input id="wo-tipok" type="checkbox"> I took this photo, and Wanderful can share it in the directory and on social with credit to my first name.</label>'+
       '<div class="wo-tiprow"><input id="wo-tipname" type="text" maxlength="40" placeholder="First name" aria-label="First name, shown with your tip" autocomplete="given-name">'+
       '<input id="wo-tipmail" type="email" placeholder="Email (private)" aria-label="Email, not shown" autocomplete="email">'+
@@ -1064,6 +1068,7 @@ root.addEventListener("click",function(e){
   var d=t.dataset;
   if (d.area){ var cc=cityCenter(d.area); closeDetail(true); if(cc) setMe(cc, cityName(d.area)); return; }
   if (d.heart){ e.preventDefault(); e.stopPropagation(); toggleSave(d.heart,t); return; }
+  if (e.target.closest(".wo-askphoto") && d.open){ openDetail(d.open); setTimeout(function(){ var fm=document.getElementById("wo-tipform"); if(fm) fm.scrollIntoView({behavior:"smooth",block:"center"}); },420); return; }
   if (d.unsave){ e.preventDefault(); toggleSave(d.unsave); render(); return; }
   if (t.hasAttribute("data-close")){ closeDetail(); return; }
   if (d.open){ e.preventDefault(); openDetail(d.open); return; }
@@ -1084,6 +1089,7 @@ root.addEventListener("click",function(e){
   else if (a==="surprise"){ var pool=DATA.filter(function(r){return r.short_description && r.listing_type!=="Online";}); openDetail(pool[Math.floor(Math.random()*pool.length)].listing_id); }
   else if (a==="more"){ S.shown+=36; render(); }
   else if (a==="clear"){ S.q=""; S.cats={}; S.badges={}; S.deal=false; S.member=false; render(); }
+  else if (a==="addphoto"){ var fm=document.getElementById("wo-tipform"), fi=document.getElementById("wo-tipphoto"); if(fm) fm.scrollIntoView({behavior:"smooth",block:"center"}); if(fi) setTimeout(function(){fi.click();},350); }
   else if (a==="closenudge"){ var nn=root.querySelector(".wo-nudge"); if(nn) nn.remove(); }
   else if (a==="sharelist"){ copy(shareBase()+(shareBase().indexOf("?")>=0?"&":"?")+"saved="+S.saved.join(".")); }
   else if (a==="clearlist"){ if (t.dataset.confirm){ S.saved=[]; saveList(); render(); toast("List cleared"); } else { t.dataset.confirm="1"; t.textContent="Tap again to clear"; setTimeout(function(){ if(t.isConnected){delete t.dataset.confirm; t.textContent="Clear list";} },3000); } }

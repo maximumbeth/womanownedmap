@@ -666,3 +666,12 @@
 .wo-nudge .wo-listform{display:grid;gap:8px}
 .wo-nudge .wo-search{padding:5px 5px 5px 14px;box-shadow:none;border-color:#fff}
 .wo-nudge .wo-search input{font-size:16px}
+
+/* photo asks */
+.wo-askphoto{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:2;display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;background:#fff;color:var(--cc,#0D2B32);border:1.3px dashed currentColor;border-radius:999px;padding:4px 10px}
+.wo-askphoto svg{width:12px;height:12px}
+.wo-photoask{display:grid;gap:8px;justify-items:start;background:#FFF7E8;border:1.5px dashed #E0B04A;border-radius:16px;padding:16px 18px}
+.wo-photoask b{display:inline-flex;align-items:center;gap:6px;font-size:16px}
+.wo-photoask b svg{width:16px;height:16px}
+.wo-photoask p{margin:0}
+.wo-row .wo-askphoto{display:none}
