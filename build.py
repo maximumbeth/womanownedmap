@@ -56,6 +56,15 @@ CATS = [
 ]
 
 
+NOUN = {"food": "place to eat and drink", "shops": "shop", "stays": "place to stay", "todo": "thing to do",
+        "well": "wellness and beauty spot", "tours": "tour company"}
+
+
+def noun_of(r):
+    cid, label, _ = cat_of(r)
+    return NOUN.get(cid) or label.lower()
+
+
 def cat_of(r):
     c = r.get("category", "")
     for name, cid, label, schema in CATS:
@@ -312,7 +321,7 @@ def main():
               {"@context": "https://schema.org", "@type": "ItemList", "name": "Woman-owned places in " + place_name, "numberOfItems": len(rs),
                "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": DOMAIN + place_url(r), "name": r["name"]} for i, r in enumerate(rs)]}]
         desc = "%s in %s, with owners' names, a map and walking routes. %s." % (plural(len(rs), "woman-owned place"), place_name, summary[0].upper() + summary[1:])
-        write("/%s/" % g, page("/%s/" % g, "Woman-owned %s: %s to visit | Woman-Owned Map" % (name, plural(len(rs), "place")), desc[:300], "\n".join(body), ld, 'data-city="%s"' % e(g)))
+        write("/%s/" % g, page("/%s/" % g, ("Woman-owned %s: %s to visit" % (name, plural(len(rs), "place"))) + (" | Woman-Owned Map" if len(name) < 18 else ""), desc[:300], "\n".join(body), ld, 'data-city="%s"' % e(g)))
         urls.append("/%s/" % g)
 
     # --- place pages ---
@@ -325,7 +334,7 @@ def main():
         cid, label, schema = cat_of(r)
         g = r.get("city_guide") if r.get("city_guide") in guides else ""
         where = ", ".join(x for x in [r.get("city"), r.get("region"), r.get("country")] if x)
-        lead = "%s is a woman-owned %s%s." % (r["name"], label.lower().rstrip("s") if cid in ("shops", "stays") else label.lower(), (" in " + where) if where and r.get("listing_type") == "Place" else "")
+        lead = "%s is a woman-owned %s%s." % (r["name"], noun_of(r), (" in " + where) if where and r.get("listing_type") == "Place" else "")
         facts = []
         if r.get("founder"):
             facts.append(("Owned by", e(r["founder"])))
@@ -351,6 +360,13 @@ def main():
             near = [x for x in guides[g] if x is not r][:6]
             more = '<section><h2>More woman-owned places in %s</h2><ul class="st-links">%s</ul><p><a href="/%s/">See the full %s guide</a></p></section>' % (
                 e(cname(g)), "".join('<li><a href="%s">%s</a></li>' % (place_url(x), e(x["name"])) for x in near), g, e(cname(g)))
+        qa = [("Is %s woman-owned?" % r["name"],
+               "Yes. %s is at least 50%% owned by women%s. It is listed on the Woman-Owned Map by Wanderful, a free directory of woman-owned places to visit." % (r["name"], (", and is owned by " + r["founder"]) if r.get("founder") else ""))]
+        if r.get("listing_type") == "Place" and where:
+            qa.append(("Where is %s?" % r["name"], "%s is in %s%s." % (r["name"], where, (", at " + r["address"]) if r.get("address") else "")))
+        if g:
+            qa.append(("What other woman-owned places are in %s?" % cname(g), "The Woman-Owned Map lists %d woman-owned places in %s, including %s." % (len(guides[g]), cname(g), ", ".join([x["name"] for x in guides[g] if x is not r][:3]))))
+        more = '<section class="st-qa"><h2>Quick answers</h2>%s</section>' % "".join("<h3>%s</h3><p>%s</p>" % (e(q), e(a)) for q, a in qa) + more
         trail = [("Woman-Owned Map", "/")] + ([("City guides", "/cities/"), (cname(g), "/%s/" % g)] if g else []) + [(r["name"], u)]
         body = ('<nav class="st-crumbs">%s</nav><article class="st-place"><p class="st-meta">%s</p><h1>%s</h1><p class="st-answer">%s</p>%s%s<dl class="st-facts">%s</dl>%s</article>%s'
                 % (" › ".join('<a href="%s">%s</a>' % (x[1], e(x[0])) for x in trail[:-1]) + " › " + e(r["name"]),
@@ -360,11 +376,16 @@ def main():
                    "".join("<dt>%s</dt><dd>%s</dd>" % f for f in facts),
                    ('<p class="st-links2">%s</p>' % " · ".join(links)) if links else "", more))
         desc = (r.get("short_description") or lead)
+        if len(desc) < 90:
+            desc += " See it on the Woman-Owned Map%s." % ((", with %d more woman-owned places in %s" % (len(guides[g]) - 1, cname(g))) if g else "")
         if r.get("founder"):
             desc = "Woman-owned, by %s. %s" % (r["founder"], desc)
         attrs = ('data-city="%s" ' % e(g) if g else 'data-view="browse" ') + 'data-place="%s"' % e(r["listing_id"])
-        title = "%s%s | Woman-Owned Map" % (r["name"], (" · woman-owned " + label.lower() + " in " + (r.get("city") or "")) if r.get("city") and r.get("listing_type") == "Place" else " · woman-owned " + label.lower())
-        write(u, page(u, title, desc[:300], body, [crumbs(trail), biz_ld(r)], attrs))
+        title = "%s, %s: woman-owned %s" % (r["name"], r["city"], noun_of(r)) if r.get("city") and r.get("listing_type") == "Place" else "%s: woman-owned %s" % (r["name"], noun_of(r))
+        if len(title) + 18 <= 65:
+            title += " | Woman-Owned Map"
+        faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in qa]}
+        write(u, page(u, title, desc[:300], body, [crumbs(trail), biz_ld(r), faq], attrs))
         urls.append(u)
 
     # --- 404, sitemap, robots, llms.txt ---
