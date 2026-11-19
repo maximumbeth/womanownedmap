@@ -173,6 +173,18 @@ def write(path, html):
 HASHES = {}
 
 
+def moved(old_path, new_path):
+    """A tiny page that sends old map.sheswanderful.com links to their new home."""
+    to = DOMAIN + new_path
+    html = ('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Moved</title>'
+            '<meta name="robots" content="noindex"><link rel="canonical" href="%s">'
+            '<meta http-equiv="refresh" content="0; url=%s"><script>location.replace(%s)</script></head>'
+            '<body><p>This page moved to <a href="%s">%s</a>.</p></body></html>') % (e(to), e(to), json.dumps(to), e(to), e(to))
+    fp = os.path.join(SITE, old_path.strip("/"), "index.html")
+    os.makedirs(os.path.dirname(fp), exist_ok=True)
+    open(fp, "w").write(html)
+
+
 def page_dates(urls):
     """Keep each page's last-changed date between builds, and list the pages that changed (for IndexNow)."""
     old = {}
@@ -415,11 +427,14 @@ def main():
             title += " | Woman-Owned Map"
         faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in qa]}
         write(u, page(u, title, desc[:300], body, [crumbs(trail), biz_ld(r), faq], attrs))
+        old = (r.get("old_seeker_slug") or "").strip().strip("/")
+        if old and re.fullmatch(r"[A-Za-z0-9_\-]+/[A-Za-z0-9_\-.,%]+", old):
+            moved("/place/%s/" % old, u)
         urls.append(u)
 
     # --- 404, sitemap, robots, llms.txt ---
     write("/404.html", page("/404.html", "Page not found | Woman-Owned Map", "This page isn't on the map.",
-                            '<section class="st-hero"><h1>That page isn\'t on the map</h1><p><a href="/">Go to the Woman-Owned Map</a> or <a href="/cities/">browse city guides</a>.</p></section>', noapp=True).replace('<link rel="canonical" href="%s/404.html">' % DOMAIN, ""))
+                            '<script>if(/^\\/place\\//.test(location.pathname))location.replace("/");</script><section class="st-hero"><h1>That page isn\'t on the map</h1><p><a href="/">Go to the Woman-Owned Map</a> or <a href="/cities/">browse city guides</a>.</p></section>', noapp=True).replace('<link rel="canonical" href="%s/404.html">' % DOMAIN, ""))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     dates = page_dates(urls)
     sm += ["<url><loc>%s%s</loc><lastmod>%s</lastmod></url>" % (DOMAIN, u, dates[u]["d"]) for u in urls]
