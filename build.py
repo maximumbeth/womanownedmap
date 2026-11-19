@@ -7,7 +7,7 @@ interactive map loaded on top for visitors. Run by GitHub Actions every night.
   python3 build.py            fetch the live feeds and build into ./site
   python3 build.py --local D  use D/listings.csv and D/cities.csv instead (for testing)
 """
-import csv, io, json, os, re, shutil, sys, urllib.request
+import csv, hashlib, io, json, os, re, shutil, sys, urllib.request
 from datetime import date
 from html import escape
 
@@ -167,6 +167,35 @@ def write(path, html):
         fp = os.path.join(fp, "index.html")
     os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, "w").write(html)
+    HASHES[path] = hashlib.sha1(html.encode("utf-8")).hexdigest()[:16]
+
+
+HASHES = {}
+
+
+def page_dates(urls):
+    """Keep each page's last-changed date between builds, and list the pages that changed (for IndexNow)."""
+    old = {}
+    try:
+        with urllib.request.urlopen(DOMAIN + "/manifest.json", timeout=20) as f:
+            old = json.loads(f.read().decode("utf-8"))
+    except Exception:
+        pass
+    new, changed = {}, []
+    for u in urls:
+        h = HASHES.get(u, "")
+        o = old.get(u) or {}
+        if o.get("h") == h:
+            new[u] = o
+        else:
+            new[u] = {"h": h, "d": TODAY}
+            changed.append(DOMAIN + u)
+    gone = [DOMAIN + u for u in old if u not in new]
+    json.dump(new, open(os.path.join(SITE, "manifest.json"), "w"), separators=(",", ":"))
+    open(os.path.join(SITE, "indexnow.txt"), "w").write("\n".join((changed + gone)[:10000]) + "\n")
+    if S.get("indexnow_key"):
+        open(os.path.join(SITE, S["indexnow_key"] + ".txt"), "w").write(S["indexnow_key"])
+    return new
 
 
 # ---------- content blocks ----------
@@ -392,7 +421,8 @@ def main():
     write("/404.html", page("/404.html", "Page not found | Woman-Owned Map", "This page isn't on the map.",
                             '<section class="st-hero"><h1>That page isn\'t on the map</h1><p><a href="/">Go to the Woman-Owned Map</a> or <a href="/cities/">browse city guides</a>.</p></section>', noapp=True).replace('<link rel="canonical" href="%s/404.html">' % DOMAIN, ""))
     sm = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    sm += ["<url><loc>%s%s</loc><lastmod>%s</lastmod></url>" % (DOMAIN, u, TODAY) for u in urls]
+    dates = page_dates(urls)
+    sm += ["<url><loc>%s%s</loc><lastmod>%s</lastmod></url>" % (DOMAIN, u, dates[u]["d"]) for u in urls]
     sm.append("</urlset>")
     open(os.path.join(SITE, "sitemap.xml"), "w").write("\n".join(sm) + "\n")
     open(os.path.join(SITE, "robots.txt"), "w").write("User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % DOMAIN)
