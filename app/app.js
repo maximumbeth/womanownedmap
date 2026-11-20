@@ -255,7 +255,7 @@ function prep(rows){
     r.isMember=/^member/i.test(r.member_status||"");
     r.badgeList=list(r.ownership_badges);
     r.ver=/^y/i.test(r.verified_woman_owned||""); r.owner=/^y/i.test(r.owner_verified||"");
-    r.hay=norm([r.name,r.city,r.region,r.country,r.category,cat(r).short,r.short_description,r.founder,r.ownership_badges,cityName(r.city_guide)].join(" "));
+    r.hay=norm([r.name,r.city,r.region,r.country,r.category,cat(r).short,r.short_description,r.founder,r.ownership_badges,r.member_deal,cityName(r.city_guide)].join(" "));
     BYID[r.listing_id]=r; return r;
   });
 }
@@ -462,8 +462,11 @@ function viewHome(){
   return h;
 }
 
+var ALLTYPE={id:"all", label:"All", test:function(){return true;}};
+function curType(){ return S.type==="all"?ALLTYPE:(TYPES.filter(function(x){return x.id===S.type;})[0]||TYPES[0]); }
+function qMatch(r,q){ for (var i=0;i<q.length;i++) if (r.hay.indexOf(q[i])<0) return false; return true; }
 function filteredBrowse(){
-  var t=TYPES.filter(function(x){return x.id===S.type;})[0]||TYPES[0];
+  var t=curType();
   var q=norm(S.q).split(/\s+/).filter(Boolean), cats=Object.keys(S.cats).filter(function(k){return S.cats[k];}), bad=Object.keys(S.badges).filter(function(k){return S.badges[k];});
   var out=DATA.filter(function(r){
     if (!t.test(r)) return false;
@@ -489,7 +492,7 @@ function sortRows(out){
 function nearest(rows,n){ rows.forEach(function(r){ r._d=geo(r)?km(S.me.lat,S.me.lng,r.lat,r.lng):Infinity; }); return rows.filter(function(r){return isFinite(r._d);}).sort(function(a,b){return a._d-b._d;}).slice(0,n); }
 
 function viewBrowse(){
-  var t=TYPES.filter(function(x){return x.id===S.type;})[0]||TYPES[0];
+  var t=curType(), bq=norm(S.q).split(/\s+/).filter(Boolean);
   var rows=filteredBrowse(), pool=DATA.filter(t.test);
   var cats=PLACE_CATS.filter(function(k){return S.type==="places" && pool.some(function(r){return r.category===k;});});
   var badges={}; pool.forEach(function(r){r.badgeList.forEach(function(b){badges[b]=1;});});
@@ -498,14 +501,14 @@ function viewBrowse(){
      '<select class="wo-select" id="wo-sort" aria-label="Sort"><option value="featured">Featured first</option><option value="new">Newest</option><option value="az">A to Z</option><option value="near">Nearest to me</option></select>'+
      '<button class="wo-btn wo-sm" type="button" data-act="near" aria-pressed="'+(!!S.me)+'">'+ico("near")+' Near me</button>'+
      (S.type==="places"||S.type==="tours"?'<button class="wo-btn wo-sm wo-dark" type="button" data-go="map">'+ico("map")+' Show on map</button>':'')+'</div>'+
-   '<div class="wo-types" role="tablist">'+TYPES.map(function(x){return '<button class="wo-type" type="button" role="tab" data-type="'+x.id+'" aria-selected="'+(x.id===S.type)+'">'+esc(x.label)+'<small>'+DATA.filter(x.test).length+'</small></button>';}).join("")+'</div>'+
+   '<div class="wo-types" role="tablist">'+[ALLTYPE].concat(TYPES).map(function(x){return '<button class="wo-type" type="button" role="tab" data-type="'+x.id+'" aria-selected="'+(x.id===S.type)+'">'+esc(x.label)+'<small>'+DATA.filter(function(r){return x.test(r)&&qMatch(r,bq);}).length.toLocaleString()+'</small></button>';}).join("")+'</div>'+
    '<div class="wo-chips">'+cats.map(function(k){return '<button class="wo-chip" type="button" data-fcat="'+esc(k)+'" aria-pressed="'+!!S.cats[k]+'" style="--cc:'+CATS[k].c+'"><span class="dot"></span>'+esc(CATS[k].short)+'</button>';}).join("")+
      (pool.some(function(r){return r.member_deal;})?'<button class="wo-chip" type="button" data-flag="deal" aria-pressed="'+S.deal+'">'+ico("tag")+' Member deal</button>':'')+
      (pool.some(function(r){return r.owner;})?'<button class="wo-chip" type="button" data-flag="ownerv" aria-pressed="'+!!S.ownerv+'">'+ico("check")+' Owner verified</button>':'')+
      (pool.some(function(r){return r.isMember;})?'<button class="wo-chip" type="button" data-flag="member" aria-pressed="'+S.member+'">Member Hosts</button>':'')+
      Object.keys(badges).sort().map(function(b){return '<button class="wo-chip" type="button" data-badge="'+esc(b)+'" aria-pressed="'+!!S.badges[b]+'">'+esc(b)+'</button>';}).join("")+
    '</div></div>'+
-   '<div class="wo-result"><span><b>'+rows.length.toLocaleString()+'</b> '+(rows.length===1?"result":"results")+(S.q?' for \u201c'+esc(S.q)+'\u201d':'')+'</span>'+
+   '<div class="wo-result"><span><b>'+rows.length.toLocaleString()+'</b> '+(rows.length===1?"result":"results")+(S.q?' for \u201c'+esc(S.q)+'\u201d':'')+(S.q&&S.type!=="all"?(function(){var n=DATA.filter(function(r){return qMatch(r,bq);}).length; return n>rows.length?' <button class="wo-linkbtn" type="button" data-type="all">See all '+n.toLocaleString()+' matches</button>':'';})():'')+'</span>'+
      ((S.q||Object.keys(S.cats).some(function(k){return S.cats[k];})||S.deal||S.member||Object.keys(S.badges).some(function(k){return S.badges[k];}))?'<button class="wo-btn wo-sm" type="button" data-act="clear">Clear filters</button>':'')+'</div>';
   if (!rows.length) h+='<div class="wo-empty"><h3>Nothing here yet</h3><p>Try a different word or clear a filter. Know a woman-owned business that should be here?</p>'+(C.recommendUrl?'<a class="wo-btn wo-pri" href="'+esc(C.recommendUrl)+'" target="_blank" rel="noopener">Recommend it</a>':'')+'</div>';
   else h+='<div class="wo-grid">'+rows.slice(0,S.shown).map(card).join("")+'</div>'+(rows.length>S.shown?'<div class="wo-more"><button class="wo-btn" type="button" data-act="more">Show more ('+(rows.length-S.shown).toLocaleString()+' left)</button></div>':'');
@@ -986,7 +989,7 @@ function applyHash(h){
   if (h.indexOf("city-")===0){ S.view="city"; S.city=h.slice(5); }
   else if (["browse","map","cities","saved","deals"].indexOf(h)>=0) S.view=h;
   else if (h==="add"){ S.view=(root.getAttribute("data-view")||"home"); setTimeout(function(){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} openAdd(); }, 400); }
-  else if (TYPES.some(function(t){return t.id===h;})){ S.view="browse"; S.type=h; }
+  else if (h==="all"||TYPES.some(function(t){return t.id===h;})){ S.view="browse"; S.type=h; }
   else S.view=(root.getAttribute("data-view")||"home");
 }
 function go(v){
@@ -1083,7 +1086,7 @@ root.addEventListener("click",function(e){
   if (d.jump){ var el=document.getElementById(d.jump); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
   if (d.scroll){ var tr=document.getElementById(d.scroll); if(tr) tr.scrollBy({left:(+d.dir)*tr.clientWidth*0.85,behavior:"smooth"}); return; }
   if (d.share){ copy(shareBase()+"#place-"+d.share); return; }
-  if (d.searchall){ var i=document.getElementById("wo-hq"); S.q=i?i.value:S.q; S.type="places"; S.cats={}; go("browse"); return; }
+  if (d.searchall){ var i=document.getElementById("wo-hq"); S.q=i?i.value:S.q; S.type="all"; S.cats={}; go("browse"); return; }
   var a=d.act;
   if (a==="near") nearMe();
   else if (a==="surprise"){ var pool=DATA.filter(function(r){return r.short_description && r.listing_type!=="Online";}); openDetail(pool[Math.floor(Math.random()*pool.length)].listing_id); }
@@ -1094,13 +1097,13 @@ root.addEventListener("click",function(e){
   else if (a==="sharelist"){ copy(shareBase()+(shareBase().indexOf("?")>=0?"&":"?")+"saved="+S.saved.join(".")); }
   else if (a==="clearlist"){ if (t.dataset.confirm){ S.saved=[]; saveList(); render(); toast("List cleared"); } else { t.dataset.confirm="1"; t.textContent="Tap again to clear"; setTimeout(function(){ if(t.isConnected){delete t.dataset.confirm; t.textContent="Clear list";} },3000); } }
   else if (a==="sharecity"){ copy(shareBase()+"#city-"+S.city); }
-  else if (d.searchall===undefined && t.id==="wo-hgo"){ var hq=document.getElementById("wo-hq"); S.q=hq.value; S.type="places"; S.cats={}; S.shown=24; go("browse"); }
+  else if (d.searchall===undefined && t.id==="wo-hgo"){ var hq=document.getElementById("wo-hq"); S.q=hq.value; S.type="all"; S.cats={}; S.shown=24; go("browse"); }
 });
 function shareBase(){ return C.shareUrl || (location.origin+location.pathname); }
 root.addEventListener("keydown",function(e){
   if (e.key==="Escape") { closeDetail(); var s=document.getElementById("wo-sug"); if(s) s.hidden=true; }
   if ((e.key==="Enter"||e.key===" ") && e.target.matches && e.target.matches("[data-open][role=button]")){ e.preventDefault(); openDetail(e.target.dataset.open); }
-  if (e.key==="Enter" && e.target.id==="wo-hq"){ S.q=e.target.value; S.type="places"; S.cats={}; S.shown=24; go("browse"); }
+  if (e.key==="Enter" && e.target.id==="wo-hq"){ S.q=e.target.value; S.type="all"; S.cats={}; S.shown=24; go("browse"); }
 });
 var tmr;
 root.addEventListener("input",function(e){
