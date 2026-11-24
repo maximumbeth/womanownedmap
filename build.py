@@ -154,11 +154,11 @@ def page(path, title, desc, body, jsonld=None, app_attrs="", noapp=False):
 </div>
 </div>
 <footer class="st-foot"><p><a href="/"><b>Woman-Owned Map</b></a> is a free directory of woman-owned places to visit, powered by <a href="https://sheswanderful.com">Wanderful</a>, the global community for women who travel.</p>
-<p><a href="/about/">About the map</a> · <a href="/cities/">All city guides</a> · <a href="%(trips)s">Woman-owned trips</a> · <a href="%(submit)s">Add a place</a> · <a href="https://sheswanderful.com/join">Become a member</a> · <a href="https://sheswanderful.com/collaborate">Partner with us</a></p></footer>
+<p><a href="%(news)s"><b>Get our newsletter</b></a> · <a href="/about/">About the map</a> · <a href="/cities/">All city guides</a> · <a href="%(trips)s">Woman-owned trips</a> · <a href="%(submit)s">Add a place</a> · <a href="https://sheswanderful.com/join">Become a member</a> · <a href="https://sheswanderful.com/collaborate">Partner with us</a></p></footer>
 %(app)s</body>
 </html>
 """ % dict(title=e(title), desc=e(desc), canon=e(canon), domain=DOMAIN, ga=ga(), ld=ld, attrs=app_attrs, nav=nav, body=body,
-           app=app, trips=e(S["trips_url"]), submit=e(S["submit_url"]))
+           app=app, trips=e(S["trips_url"]), submit=e(S["submit_url"]), news=e(S.get("newsletter_url", "https://sheswanderful.beehiiv.com/subscribe")))
 
 
 def write(path, html):
@@ -433,6 +433,16 @@ def main():
         urls.append(u)
 
     # --- about ---
+    ABOUT_FAQ = [
+        ("What is the Woman-Owned Map?", "A free directory of woman-owned places to visit: hotels, cafes, restaurants, shops, bookstores, breweries, wellness spaces and walking tours, plus woman-founded trip companies, planners and travel brands. Search a city, save the places you love, and turn your list into a walking route."),
+        ("What counts as woman-owned?", "A business is listed when it is at least 50% owned by one or more women, including businesses co-owned equally with a partner. Founded by a woman isn't enough on its own. Places on the map need a location travelers can visit."),
+        ("Who adds the listings?", "Owners list their own businesses, travelers recommend places they love, and the Wanderful team reviews every submission before it goes live. Listing is always free."),
+        ("What do the badges mean?", "Owner verified means the owner submitted or confirmed the listing herself. Certified woman-owned means the business holds a woman-owned certification or is marked women-owned on Google. Badges like Black-owned or LGBTQ+-owned come from owners or the people who nominated them. Member deal means the owner offers something special to Wanderful members."),
+        ("How do member deals work?", "Anyone can see which businesses offer a deal. Wanderful members get the codes and redemption details inside the member community."),
+        ("Something is wrong or a place closed. What do I do?", "Open the place and tap Report a problem, or use the update form. Our team checks every report and updates the listing, usually within a few days."),
+        ("I own a business. How do I update my listing or add a deal?", "Use the update form to change your details, add photos or offer a deal for Wanderful members. Entrepreneur members can also get a Member Host listing with their photo and story."),
+        ("Does it cost anything?", "No. The map is free to use and free to be listed on."),
+    ]
     # DRAFT COPY: Beth to rewrite in her own words.
     def fig(src, cap, cls=""):
         return '<figure class="ab-fig %s"><img src="/assets/photos/%s" alt="%s" loading="lazy"><figcaption>%s</figcaption></figure>' % (cls, src, e(cap), e(cap))
@@ -455,6 +465,8 @@ def main():
             '<section class="ab-who"><h2>Who we are</h2>'
             '<p class="ab-lede">The map is made by <a href="https://sheswanderful.com/about/">Wanderful</a>, a global community for women who travel. Beth Santos started Wanderful as a travel blog in 2009, and it has grown into a membership community with local hubs around the world, small-group trips, the Women in Travel Summit (WITS) for travel creators, and Siren, our home for reported stories about the women shaping travel. Beth is also the author of <i>Wander Woman</i> and the host of the <i>Wander Woman</i> travel series.</p>'
             '<div class="ab-strip">' + fig("about-wits.webp", "Creators at WITS 2025") + fig("about-peru.webp", "A Wanderful trip to Peru") + fig("about-wits-party.webp", "The WITS opening party") + '</div></section>',
+            '<section class="ab-news"><div><h2>Get the map in your inbox</h2><p>New woman-owned places, member deals, trips and stories from the Wanderful community. Free, and you can unsubscribe any time.</p></div>'
+            '<p class="ab-links"><a class="ab-btn ab-pri" href="%s">Subscribe free</a></p></section>' % e(news),
             '<section class="ab-join"><h2>Ways to join in</h2><ul class="ab-cards">%s</ul></section>' % "".join([
                 card("Become a Wanderful member", "Member deals from the businesses on this map, local hubs and meetups, virtual events and a community of women who travel.", [("Join Wanderful", "https://sheswanderful.com/join")]),
                 card("Get our newsletter", "New woman-owned places, member deals, trips and stories from the community, in your inbox.", [("Subscribe free", news)]),
@@ -466,10 +478,12 @@ def main():
                 card("Follow the map", "New places, recent member deals and the women behind them.", [("@womanownedmap", "https://www.instagram.com/womanownedmap"), ("@sheswanderful", "https://www.instagram.com/sheswanderful")]),
                 card("Partner with us", "Destinations and brands work with Wanderful to spotlight the women behind their hotels, restaurants, shops and tours.", [("Work with Wanderful", "https://sheswanderful.com/collaborate")]),
             ]),
+            '<section class="ab-faq" id="faq"><h2>Questions</h2>%s</section>' % "".join('<details><summary>%s</summary><p>%s</p></details>' % (e(q), e(a)) for q, a in ABOUT_FAQ),
             '</div>']
     write("/about/", page("/about/", "About the Woman-Owned Map | Wanderful",
                           "Why we built a free map of woman-owned places to visit, how businesses get listed, who Wanderful is and how to join in.",
                           "\n".join(body), [crumbs([("Woman-Owned Map", "/"), ("About", "/about/")]),
+                          {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in ABOUT_FAQ]},
                           {"@context": "https://schema.org", "@type": "AboutPage", "name": "About the Woman-Owned Map", "url": DOMAIN + "/about/",
                            "publisher": {"@type": "Organization", "name": "Wanderful", "url": "https://sheswanderful.com", "foundingDate": "2009", "founder": {"@type": "Person", "name": "Beth Santos"}}}],
                           noapp=True))

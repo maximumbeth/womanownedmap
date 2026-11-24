@@ -338,7 +338,7 @@
   .wo-nav{position:fixed;top:auto;bottom:0;left:0;right:0;border-bottom:0;border-top:0;background:var(--nav-bg)}
   .wo-nav .wo-in{justify-content:space-around;gap:0;padding-block:6px calc(6px + env(safe-area-inset-bottom,0px))}
   .wo-brand{display:none}
-  .wo-navbtn{flex-direction:column;gap:2px;font-size:11px;padding:6px 4px;border-radius:12px;white-space:nowrap}
+  .wo-navbtn{flex-direction:column;gap:2px;font-size:10.5px;padding:6px 2px;border-radius:12px;white-space:nowrap;min-width:0}
   .wo-navbtn .lg{display:none}
   #wo-app .wo-navbtn[aria-current="page"]{background:none;color:var(--nav-fg);box-shadow:none}
   #wo-app .wo-navbtn[aria-current="page"] .wo-ico{color:var(--accent-hi)}
@@ -675,3 +675,6 @@
 .wo-photoask b svg{width:16px;height:16px}
 .wo-photoask p{margin:0}
 .wo-row .wo-askphoto{display:none}
+
+#wo-app .wo-newsband{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 32px;background:var(--nav-bg);color:#fff;border-radius:22px;padding:28px 32px}
+#wo-app .wo-newsband h3{color:#fff;font-size:24px;margin:6px 0}#wo-app .wo-newsband p{color:#C8DDE2;max-width:560px}#wo-app .wo-newsband .wo-eyebrow{color:var(--accent-hi);display:inline-flex;gap:6px;align-items:center}

@@ -57,6 +57,7 @@ var CITY_SECTIONS = [
 ];
 var CITY_COLORS = ["var(--c-stays)","var(--c-tours)","var(--c-food)","var(--teal-deep)","var(--c-well)"];
 var P = {
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
   bed:'<path d="M3 18V7M3 14h18v4M21 18v-4a3 3 0 0 0-3-3h-7v3"/><circle cx="7" cy="11" r="1.6"/>',
   cup:'<path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2 2 0 0 1 0 4H16M8 3.5v2M12 3.5v2"/>',
   bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8a3 3 0 0 1 6 0"/>',
@@ -343,6 +344,7 @@ function shell(){
      '<button class="wo-brand" type="button" data-go="">'+(C.logoUrl?'<img src="'+esc(C.logoUrl)+'" alt="">':'')+'<span><b>Woman-Owned</b><small>by Wanderful</small></span></button>'+
      navbtn("home","home","Home")+navbtn("browse","search","Browse")+navbtn("map","map","Map")+navbtn("cities","city","Cities")+navbtn("deals","tag","Deals")+'<a class="wo-navbtn" href="'+esc(C.tripsDirectoryUrl||"https://sheswanderful.com/woman-owned-trips")+'">'+ico("compass")+'<span>Trips</span></a>'+
      navbtn("saved","heart","My list",'<span class="wo-badge" id="wo-savedn" hidden>0</span>')+
+     '<a class="wo-navbtn" href="/about/">'+ico("info")+'<span>About</span></a>'+
      '<button class="wo-navbtn wo-add" type="button" data-go="add">'+ico("plus")+'<span>Add<span class="lg"> a place</span></span></button>'+
    '</div></nav><main id="wo-view"><div class="wo-loading">Loading woman-owned places\u2026</div></main>'+
    '<div class="wo-scrim" hidden></div><aside class="wo-sheet" role="dialog" aria-modal="true" aria-label="Place details" hidden></aside>';
@@ -458,7 +460,8 @@ function viewHome(){
     ["What do the badges mean?","Owner verified means the owner submitted or confirmed the listing herself. Certified woman-owned means the business holds a woman-owned certification or is marked women-owned on Google. Badges like Black-owned or LGBTQ+-owned come from owners or the people who nominated them. Member deal means the owner offers something special to Wanderful members."],
     ["Something is wrong or a place closed. What do I do?","Open the place and tap Report a problem. Our team checks every report and updates the listing, usually within a few days."],
     ["Can I share my photos?","Yes, please. Open any place and add a photo with your tip. Our team looks at every photo before it appears."]];
-  h+='<section class="wo-sec">'+sechead("Questions","Good to know")+'<div class="wo-faq">'+FAQ.map(function(q){return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>';}).join("")+'</div></section>';
+  if (C.newsletterUrl) h+='<section class="wo-sec"><div class="wo-newsband"><div><span class="wo-eyebrow">'+ico("mail")+' Newsletter</span><h3>Get new woman-owned places in your inbox</h3><p>New places, member deals, trips and stories from the Wanderful community. Free, unsubscribe any time.</p></div><a class="wo-btn wo-pri" href="'+esc(C.newsletterUrl)+'" target="_blank" rel="noopener">Subscribe free</a></div></section>';
+  h+='<section class="wo-sec">'+sechead("Questions","Good to know")+'<div class="wo-faq">'+FAQ.map(function(q){return '<details><summary>'+esc(q[0])+'</summary><p>'+esc(q[1])+'</p></details>';}).join("")+'</div><p class="wo-small" style="margin-top:14px"><a href="/about/#faq">More questions on our About page</a></p></section>';
   return h;
 }
 

@@ -9,6 +9,7 @@ window.WO_CONFIG = {
   bulkUrl:        "https://docs.google.com/forms/d/e/1FAIpQLScM-61mtEWkl3VJNppQb3UtoT7QqYokjsTu3XQwKrRNqVgj9w/viewform",  // Form E: share a list
   memberDealsUrl: "https://community.sheswanderful.com/posts/woman-owned-deals-updates-how-to-use-member-deals",   // hub post with the codes
   memberPitch:    "Wanderful membership is $129 a year. One deal on a trip, a stay or a planning session can cover it.",   // shown on the Deals page and city guides
+  newsletterUrl:  "https://sheswanderful.beehiiv.com/subscribe?utm_source=womanownedmap",   // beehiiv signup
   joinUrl:        "https://sheswanderful.com/join",
   startHubUrl:    "https://community.sheswanderful.com/",
   featuredIds:    [],                               // optional: 3 listing_id values for the home page fan

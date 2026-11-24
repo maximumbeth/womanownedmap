@@ -52,3 +52,9 @@ body{font-family:Figtree,"Helvetica Neue",Arial,sans-serif;line-height:1.55}
 #wo-app .ab-card h3{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:21px;margin:0 0 8px;color:#0D2B32}
 #wo-app .ab-card p{font-size:15px;margin:0 0 4px;color:#29474F}#wo-app .ab-card .ab-links{margin:auto 0 0;padding-top:16px}
 @media (max-width:820px){.ab{gap:52px}.ab-hero,.ab-split{grid-template-columns:1fr;gap:24px}.ab-split .ab-fig{order:2}.ab-strip{grid-template-columns:1fr 1fr}.ab-strip .ab-fig:last-child{display:none}}
+.ab-news{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 40px;background:#0D4E5A;color:#fff;border-radius:22px;padding:36px 40px}
+#wo-app .ab-news h2{color:#fff;margin-bottom:8px}#wo-app .ab-news p{color:#D6ECEF;margin:0;max-width:560px}
+#wo-app .ab-news .ab-links{margin:0}#wo-app .ab-news .ab-pri{background:#45C2C9;border-color:#45C2C9;color:#0D2B32;font-size:16px;padding:11px 22px}
+.ab-faq{max-width:820px}.ab-faq details{border-bottom:1px solid #D5E3E8;padding:16px 0}.ab-faq details:first-of-type{border-top:1px solid #D5E3E8}
+.ab-faq summary{cursor:pointer;font-weight:600;font-size:17px;color:#0D2B32;list-style-position:outside}
+#wo-app .ab-faq details p{margin:10px 0 0;color:#29474F}
