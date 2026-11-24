@@ -185,6 +185,16 @@ def moved(old_path, new_path):
     open(fp, "w").write(html)
 
 
+def short_link(path, to):
+    """womanownedmap.com/<path> forwards to a form or signup page (easy to say and type)."""
+    html = ('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Woman-Owned Map</title>'
+            '<meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url=%s"><script>location.replace(%s)</script></head>'
+            '<body><p><a href="%s">Continue</a></p></body></html>') % (e(to), json.dumps(to), e(to))
+    fp = os.path.join(SITE, path.strip("/"), "index.html")
+    os.makedirs(os.path.dirname(fp), exist_ok=True)
+    open(fp, "w").write(html)
+
+
 def page_dates(urls):
     """Keep each page's last-changed date between builds, and list the pages that changed (for IndexNow)."""
     old = {}
@@ -488,6 +498,10 @@ def main():
                            "publisher": {"@type": "Organization", "name": "Wanderful", "url": "https://sheswanderful.com", "foundingDate": "2009", "founder": {"@type": "Person", "name": "Beth Santos"}}}],
                           noapp=True))
     urls.append("/about/")
+
+    # --- short links ---
+    for path, to in S.get("short_links", {}).items():
+        short_link(path, to)
 
     # --- 404, sitemap, robots, llms.txt ---
     write("/404.html", page("/404.html", "Page not found | Woman-Owned Map", "This page isn't on the map.",
