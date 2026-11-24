@@ -434,30 +434,39 @@ def main():
 
     # --- about ---
     # DRAFT COPY: Beth to rewrite in her own words.
+    def fig(src, cap, cls=""):
+        return '<figure class="ab-fig %s"><img src="/assets/photos/%s" alt="%s" loading="lazy"><figcaption>%s</figcaption></figure>' % (cls, src, e(cap), e(cap))
     def card(h, t, links):
-        return '<li class="st-item"><h3>%s</h3><p>%s</p><p>%s</p></li>' % (h, t, " · ".join('<a href="%s">%s</a>' % (e(u), e(l)) for l, u in links))
-    body = ['<section class="st-hero"><h1>About the Woman-Owned Map</h1>'
-            '<p class="st-lede">Every trip is a chance to put money in the hands of women. The Woman-Owned Map makes that easy: %s woman-owned restaurants, cafes, shops, stays and things to do in %d countries, plus %d woman-owned tour companies, trip planners and travel brands. It\'s free to use and free to be listed.</p></section>'
-            % ("{:,}".format(len(places)), countries, len(others)),
-            '<section class="st-qa"><h2>Why we built it</h2>'
+        return '<li class="ab-card"><h3>%s</h3><p>%s</p><p class="ab-links">%s</p></li>' % (h, t, "".join('<a class="ab-btn" href="%s">%s</a>' % (e(u), e(l)) for l, u in links))
+    news = S.get("newsletter_url", "https://sheswanderful.beehiiv.com/subscribe")
+    body = ['<div class="ab">',
+            '<section class="ab-hero"><div><span class="ab-eyebrow">About the map</span><h1>Every trip is a chance to put money in the hands of women</h1>'
+            '<p class="ab-lede">The Woman-Owned Map is a free directory of %s woman-owned restaurants, cafes, shops, stays and things to do in %d countries, plus %d woman-owned tour companies, trip planners and travel brands. It\'s free to use and free to be listed.</p>'
+            '<p class="ab-links"><a class="ab-btn ab-pri" href="/#browse">Explore the map</a><a class="ab-btn" href="%s">Get our newsletter</a></p></div>'
+            % ("{:,}".format(len(places)), countries, len(others), e(news))
+            + fig("about-margin-notes.webp", "Sarah Miller of Margin Notes Bookbar in El Paso, TX") + '</section>',
+            '<section class="ab-split">' + fig("corazon.webp", "Wanderful creators with Dulcinea Herrera of Cafe Corazon in Kansas City, MO") +
+            '<div><h2>Why we built it</h2>'
             '<p>Women own a huge share of the small businesses that make a place worth visiting, but they\'re still harder to find and harder to fund. We wanted one place where you could plan a trip around the women who run a city: who to eat with, where to stay, what to bring home. Every listing names the woman behind it, so you know who you\'re supporting.</p>'
             '<h2>How a place gets on the map</h2>'
             '<p>A business has to be at least 50%% owned by a woman (founded isn\'t enough). Owners can add themselves, and anyone can recommend a place they love. Owners who confirm their listing get an <b>Owner verified</b> badge, and businesses with a woman-owned certification, or marked women-owned on Google, get a <b>Certified woman-owned</b> badge. Some owners also offer a deal for Wanderful members.</p>'
-            '<p><a href="%s">Add your business</a> · <a href="%s">Recommend a place</a></p></section>' % (e(S["submit_url"]), e(S.get("recommend_url", S["submit_url"]))),
-            '<section class="st-qa"><h2>Who we are</h2>'
-            '<p>The map is made by <a href="https://sheswanderful.com/about/">Wanderful</a>, a global community for women who travel. Beth Santos started Wanderful as a travel blog in 2009, and it has grown into a membership community with local hubs around the world, small-group trips, the Women in Travel Summit (WITS) for travel creators, and Siren, our home for reported stories about the women shaping travel. Beth is also the author of <i>Wander Woman</i> and the host of the <i>Wander Woman</i> travel series.</p></section>',
-            '<section><h2>Ways to join in</h2><ul class="st-list">%s</ul></section>' % "".join([
+            '<p class="ab-links"><a class="ab-btn" href="%s">Add your business</a><a class="ab-btn" href="%s">Recommend a place</a></p></div></section>'
+            % (e(S["submit_url"]), e(S.get("recommend_url", S["submit_url"]))),
+            '<section class="ab-who"><h2>Who we are</h2>'
+            '<p class="ab-lede">The map is made by <a href="https://sheswanderful.com/about/">Wanderful</a>, a global community for women who travel. Beth Santos started Wanderful as a travel blog in 2009, and it has grown into a membership community with local hubs around the world, small-group trips, the Women in Travel Summit (WITS) for travel creators, and Siren, our home for reported stories about the women shaping travel. Beth is also the author of <i>Wander Woman</i> and the host of the <i>Wander Woman</i> travel series.</p>'
+            '<div class="ab-strip">' + fig("about-wits.webp", "Creators at WITS 2025") + fig("about-peru.webp", "A Wanderful trip to Peru") + fig("about-wits-party.webp", "The WITS opening party") + '</div></section>',
+            '<section class="ab-join"><h2>Ways to join in</h2><ul class="ab-cards">%s</ul></section>' % "".join([
                 card("Become a Wanderful member", "Member deals from the businesses on this map, local hubs and meetups, virtual events and a community of women who travel.", [("Join Wanderful", "https://sheswanderful.com/join")]),
-                card("List your business, bigger", "Entrepreneur members get a Member Host listing with their photo and story, top placement and a spot in our newsletter.", [("Entrepreneur membership", "https://sheswanderful.com/join-smb")]),
+                card("Get our newsletter", "New woman-owned places, member deals, trips and stories from the community, in your inbox.", [("Subscribe free", news)]),
                 card("Travel with us", "Small-group trips with Wanderful, plus trips hosted by women-owned companies and our members.", [("Wanderful trips", "https://sheswanderful.com/trips"), ("Woman-owned trips", S["trips_url"])]),
+                card("List your business, bigger", "Entrepreneur members get a Member Host listing with their photo and story, top placement and a spot in our newsletter.", [("Entrepreneur membership", "https://sheswanderful.com/join-smb")]),
                 card("Read Siren", "New stories every Monday about the women shaping travel, from the people who know them best.", [("Subscribe to Siren", "https://sirenbywanderful.substack.com")]),
-                card("Get our emails", "Start with our free Women Traveling Solo 101 class, then hear about new places, deals and trips.", [("Get the free class", "https://sheswanderful.com/wts101")]),
                 card("Come to WITS", "The Women in Travel Summit brings together travel creators, brands and destinations every year.", [("Women in Travel Summit", "https://witsummit.com/")]),
                 card("Wander Woman", "Beth\'s book about the history and future of women who travel, and the travel series that brings it to the screen.", [("Read the book", "https://sheswanderful.com/wanderwomanbook"), ("Follow the show", "https://www.instagram.com/wanderwomanshow")]),
                 card("Follow the map", "New places, recent member deals and the women behind them.", [("@womanownedmap", "https://www.instagram.com/womanownedmap"), ("@sheswanderful", "https://www.instagram.com/sheswanderful")]),
                 card("Partner with us", "Destinations and brands work with Wanderful to spotlight the women behind their hotels, restaurants, shops and tours.", [("Work with Wanderful", "https://sheswanderful.com/collaborate")]),
             ]),
-            ]
+            '</div>']
     write("/about/", page("/about/", "About the Woman-Owned Map | Wanderful",
                           "Why we built a free map of woman-owned places to visit, how businesses get listed, who Wanderful is and how to join in.",
                           "\n".join(body), [crumbs([("Woman-Owned Map", "/"), ("About", "/about/")]),
