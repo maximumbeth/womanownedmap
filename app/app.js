@@ -447,7 +447,7 @@ function viewHome(){
   h+=tripsBand()+'<div id="wo-stories"></div>';
   h+='<section class="wo-sec">'+sechead("Add to the map","Know a woman-owned spot?","Listing is free. Owners can add an optional deal for Wanderful members, and Entrepreneur members get a bigger listing.")+'<div class="wo-offer">'+
      '<div><span class="wo-eyebrow">Free listing</span><h3>Recommend or list a business</h3><ul><li>A card in the directory and its city guide</li><li>A pin on the map, with directions</li><li>Optional member deal and Member deal badge</li></ul><div class="wo-quick">'+
-       (C.submitUrl?'<a class="wo-btn wo-pri" href="'+esc(C.submitUrl)+'" target="_blank" rel="noopener">List my business</a>':'')+(C.recommendUrl?'<a class="wo-btn" href="'+esc(C.recommendUrl)+'" target="_blank" rel="noopener">Recommend a place</a>':'')+'</div></div>'+
+       (C.submitUrl?'<a class="wo-btn wo-pri" href="'+esc(C.submitUrl)+'" target="_blank" rel="noopener">List my business</a>':'')+'</div></div>'+
      '<div class="m"><span class="wo-eyebrow">Entrepreneur members</span><h3>Become a Member Host</h3><ul><li>Large card with your headshot and story</li><li>Member Host badge and top placement</li><li>Featured as Place of the week and in our newsletter</li></ul><div class="wo-quick">'+
        (C.joinUrl?'<a class="wo-btn wo-pri" href="'+esc(C.joinUrl)+'" target="_blank" rel="noopener">Become a member</a>':'')+(C.updateUrl?'<a class="wo-btn wo-ghost" href="'+esc(C.updateUrl)+'" target="_blank" rel="noopener">Update a listing</a>':'')+'</div></div></div></section></div>';
 
@@ -513,7 +513,7 @@ function viewBrowse(){
    '</div></div>'+
    '<div class="wo-result"><span><b>'+rows.length.toLocaleString()+'</b> '+(rows.length===1?"result":"results")+(S.q?' for \u201c'+esc(S.q)+'\u201d':'')+(S.q&&S.type!=="all"?(function(){var n=DATA.filter(function(r){return qMatch(r,bq);}).length; return n>rows.length?' <button class="wo-linkbtn" type="button" data-type="all">See all '+n.toLocaleString()+' matches</button>':'';})():'')+'</span>'+
      ((S.q||Object.keys(S.cats).some(function(k){return S.cats[k];})||S.deal||S.member||Object.keys(S.badges).some(function(k){return S.badges[k];}))?'<button class="wo-btn wo-sm" type="button" data-act="clear">Clear filters</button>':'')+'</div>';
-  if (!rows.length) h+='<div class="wo-empty"><h3>Nothing here yet</h3><p>Try a different word or clear a filter. Know a woman-owned business that should be here?</p>'+(C.recommendUrl?'<a class="wo-btn wo-pri" href="'+esc(C.recommendUrl)+'" target="_blank" rel="noopener">Recommend it</a>':'')+'</div>';
+  if (!rows.length) h+='<div class="wo-empty"><h3>Nothing here yet</h3><p>Try a different word or clear a filter. Know a woman-owned business that should be here?</p>'+(C.submitUrl?'<a class="wo-btn wo-pri" href="'+esc(C.submitUrl)+'" target="_blank" rel="noopener">Add it to the map</a>':'')+'</div>';
   else h+='<div class="wo-grid">'+rows.slice(0,S.shown).map(card).join("")+'</div>'+(rows.length>S.shown?'<div class="wo-more"><button class="wo-btn" type="button" data-act="more">Show more ('+(rows.length-S.shown).toLocaleString()+' left)</button></div>':'');
   return h+'</div>';
 }
@@ -586,7 +586,7 @@ function viewCities(){
     '<label class="wo-search" style="max-width:520px">'+ico("search")+'<input id="wo-cq" type="search" value="'+esc(S.cityq)+'" placeholder="Find a city" aria-label="Find a city"></label></header>';
   if (us.length) h+='<section class="wo-sec" style="padding-top:20px">'+sechead("United States",us.length+" city guides")+'<div class="wo-cityidx">'+us.map(citycard).join("")+'</div></section>';
   if (world.length) h+='<section class="wo-sec">'+sechead("Around the world",world.length+" city guides")+'<div class="wo-cityidx">'+world.map(citycard).join("")+'</div></section>';
-  if (!list.length) h+='<div class="wo-empty" style="margin-top:20px"><h3>No guide for that city yet</h3><p>Help us start one by recommending a woman-owned business there.</p>'+(C.recommendUrl?'<a class="wo-btn wo-pri" href="'+esc(C.recommendUrl)+'" target="_blank" rel="noopener">Recommend a place</a>':'')+'</div>';
+  if (!list.length) h+='<div class="wo-empty" style="margin-top:20px"><h3>No guide for that city yet</h3><p>Help us start one by recommending a woman-owned business there.</p>'+(C.submitUrl?'<a class="wo-btn wo-pri" href="'+esc(C.submitUrl)+'" target="_blank" rel="noopener">Add a place</a>':'')+'</div>';
   return h+'</div>';
 }
 
@@ -975,8 +975,7 @@ function openAdd(){
   var link=function(href,title,sub,pri){ return href?'<a class="wo-addopt'+(pri?' pri':'')+'" href="'+esc(href)+'" target="_blank" rel="noopener"><b>'+title+'</b><span>'+sub+'</span>'+ico("ext")+'</a>':'<div class="wo-addopt off"><b>'+title+'</b><span>'+sub+'</span><em class="wo-small">Link not set up yet</em></div>'; };
   sh.innerHTML='<div class="content" style="padding-top:calc(24px + env(safe-area-inset-top,0px))"><button class="close" type="button" data-close aria-label="Close" style="position:absolute;right:20px;top:20px">'+ico("close")+'</button>'+
     (PH.marginnotes?'<img class="wo-addphoto" src="'+PH.marginnotes+'" alt="An owner behind the bar at Margin Notes Bookbar in El Paso">':'')+'<span class="wo-eyebrow">Add to the map</span><h2>Know a woman-owned spot?</h2><p class="wo-small">Every listing is free and reviewed by the Wanderful team before it goes live.</p>'+
-    link(C.submitUrl,"I own the business","List it in about 5 minutes. Owners get the Owner verified badge and can add a member deal.",true)+
-    link(C.recommendUrl,"I want to recommend a place","Takes a minute. We\u2019ll check it out and invite the owner to claim it.")+
+    link(C.submitUrl,"Add a place","For owners and fans alike. Owners get the Owner verified badge and can add a member deal; fans can skip the owner questions.",true)+
     link(C.bulkUrl,"I know lots of places","Share a whole list at once, one place per line. We check each one.")+
     link(C.updateUrl,"Update or remove a listing","Moved, closed or something changed? Let us know.")+
     (C.joinUrl?'<div class="wo-offerline"><span>Entrepreneur members get a Member Host listing with a headshot, story and top placement.</span><a class="wo-btn wo-sm" href="'+esc(C.joinUrl)+'" target="_blank" rel="noopener">Become a member</a></div>':'')+'</div>';

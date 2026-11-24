@@ -4,12 +4,11 @@
   "trips_url": "https://sheswanderful.com/woman-owned-trips",
   "submit_url": "https://docs.google.com/forms/d/e/1FAIpQLScl470GfW6tJcMjPrO2KRV5mvcQFaaXhqAORBRsoxddGnOiXQ/viewform",
   "indexnow_key": "b1eff055fb97b1ca7d1e1f635b6a0ce8",
-  "recommend_url": "https://docs.google.com/forms/d/e/1FAIpQLScVUBpzrp-4hd973y7-Z5G_zONeltDMONu1h3a97OVKTMrmiA/viewform",
   "newsletter_url": "https://sheswanderful.beehiiv.com/subscribe?utm_source=womanownedmap",
   "short_links": {
     "add": "https://docs.google.com/forms/d/e/1FAIpQLScl470GfW6tJcMjPrO2KRV5mvcQFaaXhqAORBRsoxddGnOiXQ/viewform",
     "update": "https://docs.google.com/forms/d/e/1FAIpQLSceQhCj2NFf-cEQ9E3Q2FbLwwzrI39sBjwc-qSvUpjUUqoWCw/viewform",
-    "recommend": "https://docs.google.com/forms/d/e/1FAIpQLScVUBpzrp-4hd973y7-Z5G_zONeltDMONu1h3a97OVKTMrmiA/viewform",
+    "recommend": "https://docs.google.com/forms/d/e/1FAIpQLScl470GfW6tJcMjPrO2KRV5mvcQFaaXhqAORBRsoxddGnOiXQ/viewform",
     "newsletter": "https://sheswanderful.beehiiv.com/subscribe?utm_source=womanownedmap"
   }
 }

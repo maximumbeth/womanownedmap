@@ -469,9 +469,9 @@ def main():
             '<div><h2>Why we built it</h2>'
             '<p>Women own a huge share of the small businesses that make a place worth visiting, but they\'re still harder to find and harder to fund. We wanted one place where you could plan a trip around the women who run a city: who to eat with, where to stay, what to bring home. Every listing names the woman behind it, so you know who you\'re supporting.</p>'
             '<h2>How a place gets on the map</h2>'
-            '<p>A business has to be at least 50%% owned by a woman (founded isn\'t enough). Owners can add themselves, and anyone can recommend a place they love. Owners who confirm their listing get an <b>Owner verified</b> badge, and businesses with a woman-owned certification, or marked women-owned on Google, get a <b>Certified woman-owned</b> badge. Some owners also offer a deal for Wanderful members.</p>'
-            '<p class="ab-links"><a class="ab-btn" href="%s">Add your business</a><a class="ab-btn" href="%s">Recommend a place</a></p></div></section>'
-            % (e(S["submit_url"]), e(S.get("recommend_url", S["submit_url"]))),
+            '<p>A business has to be at least 50%% owned by a woman (founded isn\'t enough). Owners can add themselves, and anyone can add a place they love using the same form. Owners who confirm their listing get an <b>Owner verified</b> badge, and businesses with a woman-owned certification, or marked women-owned on Google, get a <b>Certified woman-owned</b> badge. Some owners also offer a deal for Wanderful members.</p>'
+            '<p class="ab-links"><a class="ab-btn" href="%s">Add a place</a></p></div></section>'
+            % e(S["submit_url"]),
             '<section class="ab-who"><h2>Who we are</h2>'
             '<p class="ab-lede">The map is made by <a href="https://sheswanderful.com/about/">Wanderful</a>, a global community for women who travel. Beth Santos started Wanderful as a travel blog in 2009, and it has grown into a membership community with local hubs around the world, small-group trips, the Women in Travel Summit (WITS) for travel creators, and Siren, our home for reported stories about the women shaping travel. Beth is also the author of <i>Wander Woman</i> and the host of the <i>Wander Woman</i> travel series.</p>'
             '<div class="ab-strip">' + fig("about-wits.webp", "Creators at WITS 2025") + fig("about-peru.webp", "A Wanderful trip to Peru") + fig("about-wits-party.webp", "The WITS opening party") + '</div></section>',
