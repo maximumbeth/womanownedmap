@@ -953,7 +953,7 @@ function reportBlock(r){
     '<form id="wo-reportform" data-id="'+esc(r.listing_id)+'" novalidate><fieldset><legend class="wo-small">What\u2019s wrong?</legend>'+
     opts.map(function(o,i){return '<label class="wo-radio"><input type="radio" name="wo-issue" value="'+o[0]+'"'+(i===0?'':'')+'> '+o[1]+'</label>';}).join("")+
     '</fieldset><textarea id="wo-reptext" maxlength="600" rows="3" placeholder="Anything that helps us fix it, like the new address or when it closed"></textarea>'+
-    '<div class="wo-tiprow"><input id="wo-repmail" type="email" placeholder="Your email (optional, private)" aria-label="Your email, optional" autocomplete="email">'+
+    '<div class="wo-tiprow"><input id="wo-repmail" type="email" placeholder="Your email (optional)" aria-label="Your email, optional" autocomplete="email">'+
     '<input id="wo-rephp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">'+
     '<button class="wo-btn wo-sm" type="submit">Send report</button></div>'+
     '<p class="wo-small" id="wo-repmsg" role="status">The Wanderful team checks every report before changing a listing.</p></form></details>';
@@ -967,7 +967,7 @@ function sendReport(e){
   if (!C.listEndpoint || /^PASTE_/.test(C.listEndpoint)){ msg.textContent="Thanks! On the live site this goes to the Wanderful team. (Reports aren\u2019t connected in this preview.)"; return; }
   var body=new URLSearchParams({action:"report", listing_id:r.listing_id||"", place:r.name||"", issue:ch.value, details:det, email:document.getElementById("wo-repmail").value.trim()});
   msg.textContent="Sending\u2026";
-  fetch(C.listEndpoint,{method:"POST",mode:"no-cors",body:body}).then(function(){ f.reset(); msg.textContent="Thank you. Our team will check it and update the listing."; toast(ico("flag")+" Report sent"); },function(){ msg.textContent="That didn\u2019t send. Please try again in a moment."; });
+  fetch(C.listEndpoint,{method:"POST",mode:"no-cors",body:body}).then(function(){ f.reset(); msg.textContent="Thanks! We\u2019ll take a look and update the listing."; toast(ico("flag")+" Report sent"); },function(){ msg.textContent="That didn\u2019t send. Please try again in a moment."; });
 }
 /* ---------- add a place chooser ---------- */
 function openAdd(){
