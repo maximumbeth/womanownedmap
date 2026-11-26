@@ -86,6 +86,7 @@ var P = {
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
   chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>', down:'<path d="M6 9l6 6 6-6"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
 };
 function ico(n,cls){return '<svg class="'+(cls||"wo-ico")+'" viewBox="0 0 24 24" aria-hidden="true">'+(P[n]||"")+'</svg>';}
@@ -342,9 +343,15 @@ function shell(){
   root.innerHTML =
    '<nav class="wo-nav" aria-label="Woman-Owned directory"><div class="wo-in">'+
      '<button class="wo-brand" type="button" data-go="">'+(C.logoUrl?'<img src="'+esc(C.logoUrl)+'" alt="">':'')+'<span><b>Woman-Owned</b><small>by Wanderful</small></span></button>'+
-     navbtn("home","home","Home")+navbtn("browse","search","Browse")+navbtn("map","map","Map")+navbtn("cities","city","Cities")+navbtn("deals","tag","Deals")+'<a class="wo-navbtn" href="'+esc(C.tripsDirectoryUrl||"https://sheswanderful.com/woman-owned-trips")+'">'+ico("compass")+'<span>Trips</span></a>'+
-     navbtn("saved","heart","My list",'<span class="wo-badge" id="wo-savedn" hidden>0</span>')+
-     '<a class="wo-navbtn" href="/about/">'+ico("info")+'<span>About</span></a>'+
+     navbtn("browse","search","Browse")+navbtn("map","map","Map")+navbtn("cities","city","Cities")+navbtn("deals","tag","Deals")+
+     '<div class="wo-morewrap"><button class="wo-navbtn" type="button" id="wo-morebtn" aria-expanded="false" aria-controls="wo-moremenu">'+ico("menu")+'<span>More</span>'+ico("down","wo-ico wo-caret")+'</button>'+
+       '<div class="wo-moremenu" id="wo-moremenu" hidden>'+
+         '<a href="'+esc(C.tripsDirectoryUrl||"https://sheswanderful.com/woman-owned-trips")+'">'+ico("compass")+'<span><b>Woman-owned trips</b><small>Trips run by women-owned companies</small></span></a>'+
+         '<button type="button" data-go="saved" class="wo-moreonly">'+ico("heart")+'<span><b>My list</b><small>Places you saved</small></span></button>'+
+         '<button type="button" data-go="add" class="wo-moreonly">'+ico("plus")+'<span><b>Add a place</b><small>Free for woman-owned businesses</small></span></button>'+
+         '<a href="/about/">'+ico("info")+'<span><b>About the map</b><small>How it works and who\u2019s behind it</small></span></a>'+
+       '</div></div>'+
+     navbtn("saved","heart","My list",'<span class="wo-badge" id="wo-savedn" hidden>0</span>').replace('class="wo-navbtn"','class="wo-navbtn wo-iconly" title="My list"')+
      '<button class="wo-navbtn wo-add" type="button" data-go="add">'+ico("plus")+'<span>Add<span class="lg"> a place</span></span></button>'+
    '</div></nav><main id="wo-view"><div class="wo-loading">Loading woman-owned places\u2026</div></main>'+
    '<div class="wo-scrim" hidden></div><aside class="wo-sheet" role="dialog" aria-modal="true" aria-label="Place details" hidden></aside>';
@@ -1132,6 +1139,9 @@ root.addEventListener("change",function(e){
   if (e.target.id==="wo-sort"){ S.sort=e.target.value; if (S.sort==="near" && !S.me){ nearMe(); return; } render(); }
 });
 root.addEventListener("click",function(e){ if (e.target.classList && e.target.classList.contains("wo-scrim")) closeDetail(); });
+document.addEventListener("click",function(e){ var mb=document.getElementById("wo-morebtn"), mm=document.getElementById("wo-moremenu");
+  if (mb && mm){ if (e.target.closest("#wo-morebtn")){ var o=mm.hidden; mm.hidden=!o; mb.setAttribute("aria-expanded",o); } else if (!mm.hidden){ mm.hidden=true; mb.setAttribute("aria-expanded","false"); } } });
+document.addEventListener("keydown",function(e){ if (e.key==="Escape"){ var mm=document.getElementById("wo-moremenu"); if(mm && !mm.hidden){ mm.hidden=true; var mb=document.getElementById("wo-morebtn"); if(mb){mb.setAttribute("aria-expanded","false"); mb.focus();} } } });
 document.addEventListener("click",function(e){ var s=document.getElementById("wo-sug"); if(s && !e.target.closest(".wo-searchbox")) s.hidden=true; });
 window.addEventListener("hashchange",route);
 
