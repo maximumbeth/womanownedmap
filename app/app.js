@@ -93,7 +93,7 @@ function ico(n,cls){return '<svg class="'+(cls||"wo-ico")+'" viewBox="0 0 24 24"
 /* ================= state ================= */
 var DATA=[], BYID={}, CITIES={}, CITYLIST=[], TIPS={}, GPHOTO={};
 var S = {view:"home", city:"", q:"", type:"places", cats:{}, badges:{}, deal:false, member:false, sort:"featured",
-         shown:24, me:null, saved:[], mode:"walking", cityq:"", lastView:"home"};
+         shown:24, me:null, saved:[], mode:"walking", cityq:"", dealq:"", dealtype:"all", lastView:"home"};
 var maps = {};
 
 /* ================= helpers ================= */
@@ -605,6 +605,15 @@ function viewDeals(){
     '<ol class="wo-dealsteps"><li><b>Browse</b><span>Anyone can see the deals.</span></li><li><b>Join</b><span>Become a Wanderful member.</span></li><li><b>Redeem</b><span>Codes and how to use them are in the member community.</span></li></ol>'+
     dealCta().replace('</div>$','')+'<p class="wo-small" style="margin-top:10px">Own a woman-owned business? <button class="wo-linkbtn" type="button" data-jump="wo-offerdeal">Offer members a deal</button></p></header>';
   if (!all.length) return h+'<div class="wo-empty"><h3>No deals yet</h3><p>Check back soon for new member deals.</p></div></div>';
+  var dq=norm(S.dealq).split(/\s+/).filter(Boolean), groups=[{id:"all",label:"All deals",test:function(){return true;}},{id:"places",label:"In person",test:TYPES[0].test}].concat(TYPES.slice(1));
+  var matched=all.filter(function(r){return qMatch(r,dq);});
+  groups=groups.filter(function(x){return x.id==="all"||all.some(x.test);});
+  var gsel=groups.filter(function(x){return x.id===S.dealtype;})[0]||groups[0];
+  h+='<div class="wo-toolbar wo-dealtools"><div class="wo-toolrow"><label class="wo-search">'+ico("search")+'<input id="wo-dq" type="search" value="'+esc(S.dealq)+'" placeholder="Search deals: a city, \u201cyoga\u201d, \u201c15% off\u201d, a business name" aria-label="Search member deals"></label></div>'+
+    '<div class="wo-chips">'+groups.map(function(x){var n=matched.filter(x.test).length; return '<button class="wo-chip" type="button" data-dealtype="'+x.id+'" aria-pressed="'+(x===gsel)+'">'+esc(x.label)+' <span class="wo-small">'+n+'</span></button>';}).join("")+'</div>'+
+    ((S.dealq||gsel.id!=="all")?'<div class="wo-result"><span><b>'+matched.filter(gsel.test).length+'</b> '+(matched.filter(gsel.test).length===1?"deal":"deals")+(S.dealq?' for \u201c'+esc(S.dealq)+'\u201d':'')+'</span><button class="wo-btn wo-sm" type="button" data-act="dealclear">Clear</button></div>':'')+'</div>';
+  all=matched.filter(gsel.test);
+  if (!all.length) h+='<div class="wo-empty"><h3>No deals match</h3><p>Try a different word, or <button class="wo-linkbtn" type="button" data-act="dealclear">see all deals</button>.</p></div>';
   var places=all.filter(function(r){return r.listing_type==="Place";});
   if (places.length){
     var byCity={}; places.forEach(function(r){ var g=r.city_guide||"other"; (byCity[g]=byCity[g]||[]).push(r); });
@@ -1081,6 +1090,7 @@ root.addEventListener("click",function(e){
   if (d.city){ e.preventDefault(); if (C.siteMode && CITYLIST.some(function(c){return c.slug===d.city;})){ location.href="/"+d.city+"/"; return; } go("city-"+d.city); return; }
   if (d.cat){ e.preventDefault(); S.type="places"; S.cats={}; S.cats[d.cat]=true; S.q=""; S.shown=24; go("browse"); return; }
   if (d.type){ e.preventDefault(); S.type=d.type; S.cats={}; S.badges={}; S.shown=24; if(S.view==="browse") render(); else go("browse"); return; }
+  if (d.dealtype){ S.dealtype=d.dealtype; render(); return; }
   if (d.fcat){ S.cats[d.fcat]=!S.cats[d.fcat]; S.shown=24; render(); return; }
   if (d.flag){ S[d.flag]=!S[d.flag]; S.shown=24; render(); return; }
   if (d.badge){ S.badges[d.badge]=!S.badges[d.badge]; S.shown=24; render(); return; }
@@ -1093,6 +1103,7 @@ root.addEventListener("click",function(e){
   if (a==="near") nearMe();
   else if (a==="surprise"){ var pool=DATA.filter(function(r){return r.short_description && r.listing_type!=="Online";}); openDetail(pool[Math.floor(Math.random()*pool.length)].listing_id); }
   else if (a==="more"){ S.shown+=36; render(); }
+  else if (a==="dealclear"){ S.dealq=""; S.dealtype="all"; render(); }
   else if (a==="clear"){ S.q=""; S.cats={}; S.badges={}; S.deal=false; S.member=false; render(); }
   else if (a==="addphoto"){ var fm=document.getElementById("wo-tipform"), fi=document.getElementById("wo-tipphoto"); if(fm) fm.scrollIntoView({behavior:"smooth",block:"center"}); if(fi) setTimeout(function(){fi.click();},350); }
   else if (a==="closenudge"){ var nn=root.querySelector(".wo-nudge"); if(nn) nn.remove(); }
@@ -1112,6 +1123,7 @@ root.addEventListener("input",function(e){
   var id=e.target.id;
   if (id==="wo-hq") suggest(e.target.value);
   if (id==="wo-bq"){ clearTimeout(tmr); tmr=setTimeout(function(){ S.q=e.target.value; S.shown=24; var pos=e.target.selectionStart; render(); var n=document.getElementById("wo-bq"); if(n){n.focus(); try{n.setSelectionRange(pos,pos);}catch(x){}} },220); }
+  if (id==="wo-dq"){ clearTimeout(tmr); tmr=setTimeout(function(){ S.dealq=e.target.value; var pos=e.target.selectionStart; render(); var n=document.getElementById("wo-dq"); if(n){n.focus(); try{n.setSelectionRange(pos,pos);}catch(x){}} },220); }
   if (id==="wo-cq"){ clearTimeout(tmr); tmr=setTimeout(function(){ S.cityq=e.target.value; render(); var n=document.getElementById("wo-cq"); if(n){n.focus(); n.setSelectionRange(n.value.length,n.value.length);} },180); }
 });
 root.addEventListener("submit",function(e){ if (e.target.classList && e.target.classList.contains("wo-listform")) sendList(e); if (e.target.id==="wo-tipform") sendTip(e); if (e.target.id==="wo-reportform") sendReport(e); });
